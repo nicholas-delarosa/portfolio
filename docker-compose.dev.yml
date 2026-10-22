@@ -15,5 +15,16 @@ services:
     volumes:
       - db-dev-data:/var/lib/postgresql
 
+  screenshots:
+    image: mcr.microsoft.com/playwright:v1.64.0-noble
+    restart: unless-stopped
+    init: true
+    user: pwuser
+    ipc: host
+    working_dir: /home/pwuser
+    command: ["npx", "-y", "playwright@1.64.0", "run-server", "--port", "3000", "--host", "0.0.0.0"]
+    ports:
+      - "3010:3000"
+
 volumes:
   db-dev-data:

@@ -28,6 +28,19 @@ services:
       Admin__GitHubLogin: ${ADMIN_GITHUB_LOGIN:-nicholas-delarosa}
       GitHubOAuth__ClientId: ${GITHUB_OAUTH_CLIENT_ID:-}
       GitHubOAuth__ClientSecret: ${GITHUB_OAUTH_CLIENT_SECRET:-}
+      GitHub__Token: ${GITHUB_TOKEN:-}
+      Cloudinary__Url: ${CLOUDINARY_URL:-}
+      Screenshots__PlaywrightWsEndpoint: ws://screenshots:3000/
+
+  # Navegador sin pantalla para las capturas de los demos. La versión debe coincidir con Microsoft.Playwright del backend
+  screenshots:
+    image: mcr.microsoft.com/playwright:v1.64.0-noble
+    restart: unless-stopped
+    init: true
+    user: pwuser
+    ipc: host
+    working_dir: /home/pwuser
+    command: ["npx", "-y", "playwright@1.64.0", "run-server", "--port", "3000", "--host", "0.0.0.0"]
 
   caddy:
     image: caddy:2.11.7-alpine

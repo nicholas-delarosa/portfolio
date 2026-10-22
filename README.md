@@ -68,13 +68,43 @@ cp .env.example .env   # y llena los valores
 docker compose up -d --build
 ```
 
-## Endpoints (Fase 1)
+## Sincronización con GitHub
+
+Cada 6 horas (y con el botón del admin) la API trae:
+
+| Origen | Relación | Etiqueta |
+|---|---|---|
+| Repos de `nicholas-delarosa` | `Owner` | — |
+| Repos `nicholas-delarosa-*` en organizaciones (ej. Esthercita-Factory) | `Organization` | Asociación |
+| Repos ajenos con commits o PRs tuyos | `Contributor` | "Trabajé en…" (+ asociación si es de una organización) |
+
+- Los proyectos nuevos llegan **ocultos** hasta aprobarlos en el admin.
+- Lo que personalizas en el admin (títulos, descripciones, demo, asociación fijada, imagen subida) nunca se sobrescribe.
+- Si el proyecto tiene demo, un Chromium sin pantalla (contenedor `screenshots`) toma la captura y la sube a Cloudinary.
+
+## Endpoints
 
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/api/health` | Estado de la API y la BD |
+| GET | `/api/projects?lang=es\|en` | Proyectos visibles con etiquetas |
 | GET | `/api/auth/login?returnUrl=/admin` | Inicia sesión con GitHub |
 | GET | `/api/auth/signin-github` | Callback de GitHub |
 | GET | `/api/auth/me` | ¿Hay sesión de admin? |
 | POST | `/api/auth/logout` | Cierra sesión |
-| GET | `/api/admin/ping` | Prueba de acceso de admin |
+
+**Admin** (requiere sesión):
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/admin/projects` | Todos los proyectos |
+| PUT | `/api/admin/projects/{id}` | Personalizar un proyecto |
+| PATCH | `/api/admin/projects/visibility` | Mostrar/ocultar varios |
+| PUT | `/api/admin/projects/order` | Guardar el orden |
+| POST | `/api/admin/projects` | Agregar un proyecto manual |
+| DELETE | `/api/admin/projects/{id}` | Borrar un proyecto |
+| POST / DELETE | `/api/admin/projects/{id}/image` | Subir / quitar imagen propia |
+| POST | `/api/admin/projects/{id}/screenshot` | Volver a tomar la captura |
+| GET / POST | `/api/admin/associations` | Listar / crear asociaciones |
+| PUT / DELETE | `/api/admin/associations/{id}` | Editar / borrar asociación |
+| GET / POST | `/api/admin/sync` | Estado / sincronizar ahora |

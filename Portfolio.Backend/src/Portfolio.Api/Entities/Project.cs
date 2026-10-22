@@ -47,6 +47,9 @@ public class Project : ITimestamped
     public string? ImageUrl { get; set; }
     public string? ImagePublicId { get; set; }
     public bool ImageLocked { get; set; } // true = imagen subida a mano, no se reemplaza por la captura automática
+    public string? ImageSourceUrl { get; set; } // URL del demo con la que se tomó la captura actual
+    public DateTimeOffset? ImageCapturedAt { get; set; }
+    public string? ImageError { get; set; } // Último error al tomar la captura (se muestra en el admin)
 
     public int? AssociationId { get; set; }
     public Association? Association { get; set; }
@@ -54,10 +57,19 @@ public class Project : ITimestamped
 
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+
+    // El demo puesto a mano tiene prioridad sobre el "homepage" de GitHub
+    public string? EffectiveDemoUrl() => string.IsNullOrWhiteSpace(DemoUrl) ? NullIfEmpty(GitHubHomepage) : DemoUrl;
+
+    public bool NeedsScreenshot() =>
+        !ImageLocked && EffectiveDemoUrl() is { } demo && (ImageUrl is null || ImageSourceUrl != demo);
+
+    private static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
 }
 
 public class LanguageStat
 {
     public required string Name { get; set; }
+    public string? Color { get; set; }
     public long Bytes { get; set; }
 }

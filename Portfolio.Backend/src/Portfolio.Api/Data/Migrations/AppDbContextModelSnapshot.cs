@@ -228,6 +228,14 @@ namespace Portfolio.Api.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("html_url");
 
+                    b.Property<DateTimeOffset?>("ImageCapturedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("image_captured_at");
+
+                    b.Property<string>("ImageError")
+                        .HasColumnType("text")
+                        .HasColumnName("image_error");
+
                     b.Property<bool>("ImageLocked")
                         .HasColumnType("boolean")
                         .HasColumnName("image_locked");
@@ -235,6 +243,10 @@ namespace Portfolio.Api.Data.Migrations
                     b.Property<string>("ImagePublicId")
                         .HasColumnType("text")
                         .HasColumnName("image_public_id");
+
+                    b.Property<string>("ImageSourceUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_source_url");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text")
@@ -613,6 +625,8 @@ namespace Portfolio.Api.Data.Migrations
                                 .ValueGeneratedOnAdd();
 
                             b1.Property<long>("Bytes");
+
+                            b1.Property<string>("Color");
 
                             b1.Property<string>("Name")
                                 .IsRequired();
