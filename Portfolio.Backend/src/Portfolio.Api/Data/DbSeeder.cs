@@ -53,6 +53,77 @@ public static class DbSeeder
             });
         }
 
+        // Borrador sacado de los repos de GitHub; los niveles se ajustan en el admin
+        if (!await db.Skills.AnyAsync())
+        {
+            (string Name, SkillCategory Category, int Level, string Icon)[] skills =
+            [
+                ("HTML", SkillCategory.Frontend, 5, "html5"),
+                ("CSS / SCSS", SkillCategory.Frontend, 4, "css3"),
+                ("JavaScript", SkillCategory.Frontend, 4, "javascript"),
+                ("TypeScript", SkillCategory.Frontend, 3, "typescript"),
+                ("React", SkillCategory.Frontend, 3, "react"),
+                ("Angular", SkillCategory.Frontend, 2, "angular"),
+                ("C#", SkillCategory.Backend, 4, "csharp"),
+                (".NET", SkillCategory.Backend, 4, "dotnetcore"),
+                ("Python", SkillCategory.Backend, 3, "python"),
+                ("PostgreSQL", SkillCategory.Database, 3, "postgresql"),
+                ("Docker", SkillCategory.DevOps, 3, "docker"),
+                ("Git / GitHub", SkillCategory.Tools, 4, "git")
+            ];
+            db.Skills.AddRange(skills.Select((s, i) => new Skill
+            {
+                Name = s.Name, Category = s.Category, Level = s.Level, Icon = s.Icon, SortOrder = i
+            }));
+        }
+
+        if (!await db.TimelineEntries.AnyAsync())
+        {
+            db.TimelineEntries.AddRange(
+                new TimelineEntry
+                {
+                    Kind = TimelineKind.Education,
+                    TitleEs = "Desarrollo Web",
+                    TitleEn = "Web Development",
+                    Organization = "CoderHouse",
+                    DescriptionEs = "HTML, CSS, SASS y JavaScript. Proyecto final: Deltarune Fan Page.",
+                    DescriptionEn = "HTML, CSS, SASS and JavaScript. Final project: Deltarune Fan Page.",
+                    StartDate = new DateOnly(2025, 3, 1),
+                    EndDate = new DateOnly(2025, 5, 31)
+                },
+                new TimelineEntry
+                {
+                    Kind = TimelineKind.Education,
+                    TitleEs = "React JS",
+                    TitleEn = "React JS",
+                    Organization = "CoderHouse",
+                    DescriptionEs = "Componentes, props, hooks y enrutamiento. Proyecto final: tienda online en React.",
+                    DescriptionEn = "Components, props, hooks and routing. Final project: an online store built with React.",
+                    StartDate = new DateOnly(2025, 6, 1),
+                    EndDate = new DateOnly(2025, 9, 30)
+                },
+                new TimelineEntry
+                {
+                    Kind = TimelineKind.Education,
+                    TitleEs = "Formación en Desarrollo de Software",
+                    TitleEn = "Software Development Program",
+                    Organization = "Riwi",
+                    DescriptionEs = "Python, bases de datos, C# y .NET, Angular y trabajo en equipo con metodologías ágiles.",
+                    DescriptionEn = "Python, databases, C# and .NET, Angular and agile teamwork.",
+                    StartDate = new DateOnly(2026, 3, 1)
+                },
+                new TimelineEntry
+                {
+                    Kind = TimelineKind.Milestone,
+                    TitleEs = "Primer sistema full-stack: InfectionSolutions",
+                    TitleEn = "First full-stack system: InfectionSolutions",
+                    Organization = "Esthercita Factory",
+                    DescriptionEs = "API en C# / .NET con cliente en TypeScript, desplegado con Docker.",
+                    DescriptionEn = "C# / .NET API with a TypeScript client, deployed with Docker.",
+                    StartDate = new DateOnly(2026, 10, 8)
+                });
+        }
+
         await db.SaveChangesAsync();
     }
 }

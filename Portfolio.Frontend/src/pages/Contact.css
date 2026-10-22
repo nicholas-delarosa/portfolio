@@ -1,0 +1,123 @@
+.contact-available {
+  font-family: var(--font-menu);
+  color: var(--yellow);
+  margin: -12px 0 24px;
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* El título ACT en naranja, como el botón del juego */
+.contact-act-title {
+  color: var(--tp);
+}
+
+.contact-act-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-act-menu .menu-item {
+  font-size: var(--fs-lg);
+}
+
+.contact-act-menu .menu-item.soul-inside {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contact-act-menu .soul-slot {
+  display: inline-flex;
+  align-items: center;
+}
+
+.contact-act-detail {
+  font-family: var(--font-text);
+  font-size: var(--fs-sm);
+  color: var(--gray);
+  word-break: break-all;
+}
+
+.contact-notice {
+  min-height: 1.5em;
+  margin-top: 16px;
+  font-size: var(--fs-md);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-field label {
+  font-size: var(--fs-md);
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--black);
+  border: 2px solid var(--white);
+  border-radius: 0;
+  font-family: var(--font-text);
+  font-size: var(--fs-md);
+  resize: vertical;
+}
+
+.contact-field input:focus-visible,
+.contact-field textarea:focus-visible {
+  outline: none;
+  border-color: var(--yellow);
+}
+
+.contact-field [aria-invalid='true'] {
+  border-color: var(--error);
+}
+
+.contact-field-error,
+.contact-error {
+  color: var(--error);
+  font-size: var(--fs-sm);
+}
+
+.contact-error {
+  font-size: var(--fs-md);
+}
+
+.contact-submit.menu-item {
+  font-size: var(--fs-lg);
+}
+
+.contact-sent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: var(--fs-lg);
+}
+
+.contact-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+@media (max-width: 860px) {
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+}

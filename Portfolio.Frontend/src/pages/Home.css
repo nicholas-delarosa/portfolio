@@ -1,0 +1,137 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-intro {
+  text-align: center;
+  margin: 24px 0 40px;
+}
+
+.home-name {
+  font-family: var(--font-logo);
+  font-size: var(--fs-xxl);
+  letter-spacing: 2px;
+}
+
+.home-role {
+  margin-top: 12px;
+  font-size: var(--fs-md);
+}
+
+.home-available {
+  margin-top: 8px;
+  font-family: var(--font-menu);
+  color: var(--yellow);
+}
+
+.home-prompt {
+  align-self: stretch;
+  text-align: center;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto 16px;
+  font-size: var(--fs-lg);
+}
+
+.home-files {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Cada sección es un "archivo de guardado" con borde blanco */
+.home-file.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+  border: var(--border);
+  padding: 20px 28px;
+}
+
+.home-file-title {
+  display: inline-flex;
+  align-items: center;
+}
+
+.home-file:focus {
+  background: var(--row-selected);
+}
+
+.home-file-top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: var(--fs-xl);
+}
+
+.home-file-meta {
+  font-size: var(--fs-lg);
+}
+
+.home-file-hint {
+  font-family: var(--font-text);
+  font-size: var(--fs-md);
+  color: var(--gray);
+}
+
+.home-file:focus .home-file-hint {
+  color: var(--white);
+}
+
+.home-featured {
+  width: 100%;
+  max-width: 720px;
+  margin-top: 40px;
+}
+
+.home-featured-label {
+  font-size: var(--fs-md);
+  margin-bottom: 16px;
+}
+
+.home-featured-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.home-featured-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border: 2px solid var(--white);
+}
+
+.home-featured-title {
+  font-size: var(--fs-lg);
+}
+
+.home-featured-text {
+  text-align: justify;
+  margin: 8px 0 12px;
+  color: var(--gray);
+  font-size: var(--fs-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .home-file.menu-item {
+    padding: 16px;
+  }
+
+  .home-featured-body {
+    grid-template-columns: 1fr;
+  }
+}

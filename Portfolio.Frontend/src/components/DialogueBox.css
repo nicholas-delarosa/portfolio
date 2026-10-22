@@ -1,0 +1,65 @@
+.dialogue {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  min-height: 120px;
+  cursor: default;
+}
+
+.dialogue-portrait {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  image-rendering: pixelated;
+  border: 2px solid var(--white);
+}
+
+.dialogue-text {
+  flex: 1;
+  text-align: justify;
+  font-family: var(--font-text);
+  font-size: var(--fs-lg);
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+.dialogue-ghost {
+  visibility: hidden;
+}
+
+/* Triángulo parpadeante de "continuar" */
+.dialogue-next {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 10px solid var(--white);
+  animation: dialogue-blink 1s steps(2, start) infinite;
+}
+
+@keyframes dialogue-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialogue {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dialogue-text {
+    font-size: var(--fs-md);
+  }
+
+  .dialogue-portrait {
+    width: 72px;
+    height: 72px;
+  }
+}

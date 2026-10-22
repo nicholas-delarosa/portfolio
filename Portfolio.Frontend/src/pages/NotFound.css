@@ -1,0 +1,24 @@
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  min-height: 80vh;
+  padding: var(--gutter);
+  text-align: center;
+}
+
+.not-found-title {
+  font-size: clamp(48px, 10vw, 100px);
+  color: var(--error);
+}
+
+.not-found-message {
+  font-size: var(--fs-lg);
+  max-width: 32ch;
+}
+
+.not-found-link.menu-item {
+  font-size: var(--fs-xl);
+}

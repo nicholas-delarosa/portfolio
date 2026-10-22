@@ -13,8 +13,7 @@
 		reverse_proxy api:8080
 	}
 
-	# El frontend llega en la Fase 3
 	handle {
-		respond "* El portafolio se está construyendo. Llénate de determinación." 200
+		reverse_proxy web:80
 	}
 }

@@ -1,0 +1,30 @@
+.language-bar-track {
+  display: flex;
+  height: 14px;
+  border: 2px solid var(--white);
+  gap: 2px;
+  background: var(--white);
+}
+
+.language-bar-track span {
+  min-width: 4px;
+}
+
+.language-bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 10px;
+  font-size: var(--fs-sm);
+}
+
+.language-bar-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.language-bar-dot {
+  width: 10px;
+  height: 10px;
+}

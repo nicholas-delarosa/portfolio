@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,15 @@ builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Ad
 builder.Services.AddProblemDetails();
 builder.Services.AddAdminAuth(builder.Configuration);
 
+// Máximo 3 mensajes de contacto cada 10 minutos por IP
+builder.Services.AddRateLimiter(o =>
+{
+    o.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    o.AddPolicy(SiteEndpoints.ContactRateLimit, ctx => RateLimitPartition.GetFixedWindowLimiter(
+        ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 3, Window = TimeSpan.FromMinutes(10) }));
+});
+
 // Sincronización con GitHub
 builder.Services.Configure<GitHubOptions>(builder.Configuration.GetSection(GitHubOptions.Section));
 builder.Services.Configure<GitHubSyncOptions>(builder.Configuration.GetSection(GitHubSyncOptions.Section));
@@ -53,6 +63,7 @@ app.UseForwardedHeaders();
 app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapGet("/api/health", async (AppDbContext db) =>
     await db.Database.CanConnectAsync()
@@ -61,6 +72,7 @@ app.MapGet("/api/health", async (AppDbContext db) =>
 
 app.MapAuthEndpoints();
 app.MapPublicEndpoints();
+app.MapSiteEndpoints();
 
 var admin = app.MapGroup("/api/admin").RequireAuthorization(AuthSetup.AdminPolicy);
 admin.MapGet("/ping", (ClaimsPrincipal user) => new { message = $"* {user.Identity!.Name} está lleno de determinación." });

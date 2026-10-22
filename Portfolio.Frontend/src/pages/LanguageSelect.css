@@ -1,0 +1,32 @@
+.lang-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  min-height: 100vh;
+  padding: var(--gutter);
+}
+
+.lang-select-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px 96px;
+}
+
+.lang-select-option.menu-item {
+  font-size: clamp(48px, 9vw, 100px);
+}
+
+.lang-select-hint {
+  color: var(--gray);
+  font-family: var(--font-menu);
+  font-size: var(--fs-sm);
+}
+
+@media (hover: none) {
+  .lang-select-hint {
+    display: none;
+  }
+}

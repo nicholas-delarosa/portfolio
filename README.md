@@ -6,6 +6,7 @@ Portafolio personal con estética Deltarune/Undertale. Los proyectos se sincroni
 
 | Pieza | Tecnología |
 |---|---|
+| Frontend | React 19 + TypeScript 7 + Vite 8 (servido con nginx) |
 | API | .NET 10 (Minimal APIs) + EF Core 10 |
 | Base de datos | PostgreSQL 18 |
 | Login admin | GitHub OAuth (solo `nicholas-delarosa`) |
@@ -25,7 +26,16 @@ Portfolio/
 │   ├── Portfolio.Backend.slnx      Solución
 │   ├── dotnet-tools.json           Herramientas (dotnet-ef)
 │   └── Dockerfile
-├── Portfolio.Frontend/             React + Vite (Fase 3)
+├── Portfolio.Frontend/             React + TypeScript + Vite
+│   ├── public/                     Fuentes Determination, sonidos y el alma
+│   ├── src/
+│   │   ├── components/             Menú con el alma, caja de diálogo, layout, video de entrada
+│   │   ├── pages/                  Idioma, Inicio, Proyectos, Información, Contacto, 404
+│   │   ├── i18n.ts                 Textos y rutas en español e inglés
+│   │   ├── sound.ts                Sonidos (hover, click y "blip" del diálogo)
+│   │   └── useGameKeys.ts          Controles: flechas, Z confirmar, X/Esc volver
+│   ├── nginx.conf
+│   └── Dockerfile
 ├── Caddyfile                       Proxy inverso + HTTPS automático
 ├── docker-compose.yml              Producción (db + api + caddy)
 └── docker-compose.dev.yml          Desarrollo (solo db en el puerto 5440)
@@ -42,6 +52,13 @@ docker compose -f docker-compose.dev.yml up -d
 # 2. API (aplica migraciones y datos iniciales al arrancar)
 cd Portfolio.Backend/src/Portfolio.Api
 dotnet run --launch-profile http   # http://localhost:5055/api/health
+```
+
+```bash
+# 3. Frontend (http://localhost:5173, redirige /api a la API)
+cd Portfolio.Frontend
+npm install
+npm run dev
 ```
 
 Para probar el login de GitHub en local guarda las credenciales con *user-secrets* (no quedan en el repo):
@@ -88,6 +105,8 @@ Cada 6 horas (y con el botón del admin) la API trae:
 |---|---|---|
 | GET | `/api/health` | Estado de la API y la BD |
 | GET | `/api/projects?lang=es\|en` | Proyectos visibles con etiquetas |
+| GET | `/api/site?lang=es\|en` | Perfil, habilidades, línea de tiempo, lenguajes de GitHub y destacado |
+| POST | `/api/contact` | Formulario de contacto (máx. 3 cada 10 min por IP) |
 | GET | `/api/auth/login?returnUrl=/admin` | Inicia sesión con GitHub |
 | GET | `/api/auth/signin-github` | Callback de GitHub |
 | GET | `/api/auth/me` | ¿Hay sesión de admin? |

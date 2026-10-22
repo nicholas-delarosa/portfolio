@@ -42,11 +42,16 @@ services:
     working_dir: /home/pwuser
     command: ["npx", "-y", "playwright@1.64.0", "run-server", "--port", "3000", "--host", "0.0.0.0"]
 
+  web:
+    build: ./Portfolio.Frontend
+    restart: unless-stopped
+
   caddy:
     image: caddy:2.11.7-alpine
     restart: unless-stopped
     depends_on:
       - api
+      - web
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"

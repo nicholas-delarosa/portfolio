@@ -1,0 +1,297 @@
+/* ---------- Panel con marco lila y adornos en las esquinas ---------- */
+.panel {
+  position: relative;
+  border: 4px solid var(--frame);
+  padding: 20px 24px 14px;
+  margin-top: 16px;
+}
+
+/* Destellos pixelados en las 4 esquinas */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  pointer-events: none;
+  --spark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Cpath fill='%23cfcaf0' d='M3 0h1v2h2v1h1v1H6v1H4v2H3V5H1V4H0V3h1V2h2z'/%3E%3Cpath fill='%23fff' d='M3 3h1v1H3z'/%3E%3C/svg%3E");
+  background:
+    var(--spark) top left / 24px no-repeat,
+    var(--spark) top right / 24px no-repeat,
+    var(--spark) bottom left / 24px no-repeat,
+    var(--spark) bottom right / 24px no-repeat;
+  image-rendering: pixelated;
+}
+
+.panel-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 36px;
+  margin-bottom: 14px;
+}
+
+.panel-tab-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 36px;
+}
+
+.panel-tab {
+  font-size: var(--fs-xl);
+  line-height: 1.1;
+}
+
+.panel-tab.menu-item {
+  padding: 0;
+  color: var(--tab-dim);
+}
+
+.panel-tab.menu-item:focus {
+  color: var(--yellow);
+}
+
+/* ---------- Chips de filtro ---------- */
+.projects-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.projects-chip.menu-item {
+  padding: 4px 12px;
+  border: 2px solid var(--frame-dim);
+  color: var(--gray);
+  font-size: var(--fs-md);
+}
+
+.projects-chip.menu-item[aria-pressed='true'] {
+  border-color: var(--white);
+  color: var(--white);
+}
+
+.projects-chip.menu-item:focus {
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+
+.projects-chip-count {
+  margin-left: 8px;
+  color: var(--gray);
+}
+
+.projects-empty {
+  padding: 24px 0;
+}
+
+/* ---------- Lista + vista previa ---------- */
+.projects-body {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 42%);
+  gap: 20px;
+  align-items: start;
+}
+
+.projects-list {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.projects-group + .projects-group {
+  margin-top: 10px;
+}
+
+.projects-group-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--gray);
+  font-size: var(--fs-md);
+  margin-bottom: 4px;
+}
+
+.projects-group-label::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: var(--frame-dim);
+}
+
+.projects-row.menu-item {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  padding: 4px 10px;
+  color: var(--yellow);
+  font-size: var(--fs-md);
+}
+
+/* La fila elegida queda marcada aunque el alma esté en los filtros */
+.projects-row.menu-item[aria-current='true'] {
+  background: var(--row-selected);
+}
+
+.projects-row.menu-item:focus {
+  background: var(--row-selected);
+  color: var(--yellow);
+}
+
+.projects-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projects-row-star {
+  color: var(--yellow);
+  flex: none;
+}
+
+.projects-row-marks {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: auto;
+  flex: none;
+}
+
+.projects-row-marks span {
+  width: 10px;
+  height: 10px;
+}
+
+.projects-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.projects-preview img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border: 4px solid var(--white);
+  background: var(--black);
+}
+
+/* La tarjeta de GitHub es más ancha: se muestra completa */
+.projects-preview img.projects-preview-card {
+  aspect-ratio: 2 / 1;
+  object-fit: contain;
+}
+
+.projects-preview img.projects-preview-soul {
+  object-fit: none;
+  object-position: center;
+}
+
+/* ---------- Caja de descripción ---------- */
+.projects-description {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 132px;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border: 3px solid var(--frame-dim);
+}
+
+.projects-description-title {
+  font-family: var(--font-menu);
+  font-size: var(--fs-lg);
+}
+
+.projects-description-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  color: var(--gray);
+  font-family: var(--font-menu);
+  font-size: var(--fs-sm);
+}
+
+/* ---------- Barra de teclas ---------- */
+.projects-hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 28px;
+  margin-top: 12px;
+  font-family: var(--font-menu);
+  color: var(--gray);
+}
+
+button.projects-hint:not(:disabled):hover {
+  color: var(--white);
+}
+
+button.projects-hint:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.projects-hint-count {
+  margin-left: auto;
+}
+
+.projects-sheet {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .panel {
+    padding: 16px 14px 12px;
+  }
+
+  .panel-tabs,
+  .panel-tab-links {
+    gap: 4px 20px;
+  }
+
+  .panel-tab {
+    font-size: var(--fs-lg);
+  }
+
+  .projects-chip.menu-item {
+    padding: 2px 8px;
+    font-size: var(--fs-sm);
+  }
+
+  .projects-body {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-list {
+    max-height: none;
+  }
+
+  /* En el celular la vista previa y las teclas viven en el panel de detalle */
+  .projects-body > .projects-preview,
+  .panel > .projects-description,
+  .projects-hints {
+    display: none;
+  }
+
+  .projects-sheet {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    overflow-y: auto;
+    background: var(--black);
+    padding: var(--gutter);
+  }
+
+  .projects-sheet .projects-description {
+    margin-top: 0;
+  }
+
+  .projects-sheet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    font-size: var(--fs-lg);
+  }
+}
