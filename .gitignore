@@ -1,0 +1,20 @@
+# Secretos
+.env
+**/appsettings.*.local.json
+
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Node
+node_modules/
+dist/
+
+# Sistema
+desktop.ini
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/
