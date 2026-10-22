@@ -127,3 +127,21 @@ Cada 6 horas (y con el botón del admin) la API trae:
 | GET / POST | `/api/admin/associations` | Listar / crear asociaciones |
 | PUT / DELETE | `/api/admin/associations/{id}` | Editar / borrar asociación |
 | GET / POST | `/api/admin/sync` | Estado / sincronizar ahora |
+| GET / PUT | `/api/admin/profile` | Perfil (textos ES/EN, contacto, disponibilidad, idiomas) |
+| POST / DELETE | `/api/admin/profile/photo` | Foto (Cloudinary) |
+| POST / DELETE | `/api/admin/profile/cv/{es\|en}` | CV en PDF (guardado en la BD, servido en `/api/files/cv-es`) |
+| GET / PUT | `/api/admin/skills` | Habilidades (lista completa) |
+| GET / PUT | `/api/admin/timeline` | Trayectoria (lista completa) |
+| GET | `/api/admin/messages` | Mensajes de contacto |
+| PATCH / DELETE | `/api/admin/messages/{id}` | Marcar leído / borrar |
+
+## Panel de admin
+
+`/admin` → "Entrar con GitHub" (solo la cuenta `ADMIN_GITHUB_LOGIN`). Desde ahí se manejan proyectos, asociaciones,
+perfil y CV, habilidades, trayectoria, mensajes y la sincronización.
+
+Los avisos de mensajes por correo usan [Resend](https://resend.com): sin dominio propio, Resend solo envía al correo
+con el que se creó la cuenta (justo el tuyo). Si un envío falla se reintenta cada 10 minutos durante 3 días.
+
+En desarrollo existe `POST /api/auth/dev-login` para pruebas automáticas; **solo** se registra con
+`ASPNETCORE_ENVIRONMENT=Development` (en Docker no existe).

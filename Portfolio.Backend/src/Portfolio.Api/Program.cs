@@ -8,6 +8,7 @@ using Portfolio.Api.Auth;
 using Portfolio.Api.Data;
 using Portfolio.Api.Endpoints;
 using Portfolio.Api.Media;
+using Portfolio.Api.Notifications;
 using Portfolio.Api.Sync;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,10 +58,20 @@ builder.Services.AddSingleton<ScreenshotService>();
 builder.Services.AddSingleton<ScreenshotQueue>();
 builder.Services.AddHostedService<ScreenshotWorker>();
 
+// Avisos por correo de los mensajes de contacto (Resend)
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.Section));
+builder.Services.AddHttpClient(nameof(ContactNotifier), http => http.Timeout = TimeSpan.FromSeconds(30));
+builder.Services.AddSingleton<ContactNotifier>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<ContactNotifier>());
+
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-app.UseExceptionHandler();
+// Un JSON mal formado es culpa de quien lo envía (400), no un error del servidor (500)
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = ex => ex is BadHttpRequestException bad ? bad.StatusCode : StatusCodes.Status500InternalServerError
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
@@ -73,12 +84,14 @@ app.MapGet("/api/health", async (AppDbContext db) =>
 app.MapAuthEndpoints();
 app.MapPublicEndpoints();
 app.MapSiteEndpoints();
+app.MapFileEndpoints();
 
 var admin = app.MapGroup("/api/admin").RequireAuthorization(AuthSetup.AdminPolicy);
 admin.MapGet("/ping", (ClaimsPrincipal user) => new { message = $"* {user.Identity!.Name} está lleno de determinación." });
 admin.MapAdminProjectEndpoints();
 admin.MapAdminAssociationEndpoints();
 admin.MapAdminSyncEndpoints();
+admin.MapAdminContentEndpoints();
 
 await app.MigrateAndSeedAsync();
 app.Run();

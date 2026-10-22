@@ -500,6 +500,38 @@ namespace Portfolio.Api.Data.Migrations
                     b.ToTable("skills", (string)null);
                 });
 
+            modelBuilder.Entity("Portfolio.Api.Entities.StoredFile", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("key");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("content_type");
+
+                    b.Property<byte[]>("Data")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("data");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Key")
+                        .HasName("pk_stored_files");
+
+                    b.ToTable("stored_files", (string)null);
+                });
+
             modelBuilder.Entity("Portfolio.Api.Entities.SyncRun", b =>
                 {
                     b.Property<int>("Id")

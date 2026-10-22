@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<TimelineEntry> TimelineEntries => Set<TimelineEntry>();
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<SyncRun> SyncRuns => Set<SyncRun>();
+    public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
 
     // Llaves de cifrado de las cookies, guardadas en la BD para que la sesión sobreviva a reinicios del contenedor
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -49,6 +50,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         b.Entity<Skill>().Property(s => s.Category).HasConversion<string>().HasMaxLength(20);
         b.Entity<TimelineEntry>().Property(t => t.Kind).HasConversion<string>().HasMaxLength(20);
         b.Entity<ContactMessage>().HasIndex(m => m.CreatedAt);
+        b.Entity<StoredFile>(e =>
+        {
+            e.HasKey(f => f.Key);
+            e.Property(f => f.Key).HasMaxLength(40);
+        });
         b.Entity<SyncRun>(e =>
         {
             e.Property(r => r.Trigger).HasConversion<string>().HasMaxLength(20);

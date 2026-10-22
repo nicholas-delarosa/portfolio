@@ -25,6 +25,18 @@ public static class AuthEndpoints
             return Results.NoContent();
         });
 
+        // SOLO en desarrollo (dotnet run en tu PC): entra como admin sin GitHub, para pruebas automáticas.
+        // En producción (Docker) el entorno es Production y este endpoint no existe
+        if (app is WebApplication { Environment: var env } && env.IsDevelopment())
+        {
+            group.MapPost("/dev-login", async (HttpContext ctx, IConfiguration config) =>
+            {
+                var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, config["Admin:GitHubLogin"]!)], CookieAuthenticationDefaults.AuthenticationScheme);
+                await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                return Results.NoContent();
+            });
+        }
+
         group.MapGet("/me", (ClaimsPrincipal user, IConfiguration config) =>
         {
             var login = user.Identity?.Name;

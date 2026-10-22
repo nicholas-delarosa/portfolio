@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Api.Data;
 using Portfolio.Api.Entities;
+using Portfolio.Api.Notifications;
 
 namespace Portfolio.Api.Endpoints;
 
@@ -113,7 +114,7 @@ public static class SiteEndpoints
             return new SiteDto(profile, skills, timeline, githubLanguages, stats, featured);
         });
 
-        app.MapPost("/api/contact", async (ContactRequest req, AppDbContext db, ILogger<ContactRequest> logger, CancellationToken ct) =>
+        app.MapPost("/api/contact", async (ContactRequest req, AppDbContext db, ContactNotifier notifier, ILogger<ContactRequest> logger, CancellationToken ct) =>
         {
             // Campo trampa: invisible para personas, los bots lo llenan. Se responde "ok" para no darles pistas
             if (!string.IsNullOrEmpty(req.Website))
@@ -136,6 +137,7 @@ public static class SiteEndpoints
             });
             await db.SaveChangesAsync(ct);
             logger.LogInformation("Nuevo mensaje de contacto de {Email}", req.Email);
+            notifier.Notify();
             return Results.Accepted();
         }).RequireRateLimiting(ContactRateLimit);
     }

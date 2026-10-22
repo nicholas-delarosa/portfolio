@@ -30,6 +30,8 @@ services:
       GitHubOAuth__ClientSecret: ${GITHUB_OAUTH_CLIENT_SECRET:-}
       GitHub__Token: ${GITHUB_TOKEN:-}
       Cloudinary__Url: ${CLOUDINARY_URL:-}
+      Email__ResendApiKey: ${RESEND_API_KEY:-}
+      Email__NotifyTo: ${NOTIFY_EMAIL:-}
       Screenshots__PlaywrightWsEndpoint: ws://screenshots:3000/
 
   # Navegador sin pantalla para las capturas de los demos. La versión debe coincidir con Microsoft.Playwright del backend
