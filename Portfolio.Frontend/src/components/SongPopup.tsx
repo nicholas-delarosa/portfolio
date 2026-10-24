@@ -4,7 +4,7 @@ import './SongPopup.css'
 
 const VISIBLE_MS = 4500
 
-// Cartel "♪~Título" como el del juego al empezar cada canción (en la habitación secreta no sale)
+// Cartel "♪~Título" como el del juego al empezar cada canción, arriba a la derecha (en la habitación secreta no sale)
 export default function SongPopup() {
   const song = useSongStart()
   const [shown, setShown] = useState<SongStart | null>(null)
