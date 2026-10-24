@@ -1,0 +1,44 @@
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: var(--black);
+  cursor: pointer;
+}
+
+.gate:focus {
+  outline: none;
+}
+
+.gate-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+  font-size: var(--fs-lg);
+  text-align: left;
+}
+
+.gate-title {
+  font-size: var(--fs-xl);
+  color: var(--yellow);
+  margin-bottom: 8px;
+}
+
+.gate-action {
+  margin-top: 28px;
+  font-family: var(--font-menu);
+  font-size: var(--fs-md);
+  color: var(--gray);
+  text-align: center;
+  animation: gate-blink 1.2s steps(2, start) infinite;
+}
+
+@keyframes gate-blink {
+  to {
+    visibility: hidden;
+  }
+}

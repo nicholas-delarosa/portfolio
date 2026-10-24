@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { rememberLang, storedLang, type Lang } from '../i18n'
 import { Menu, MenuLink } from '../components/Menu'
 import { useGameKeys } from '../useGameKeys'
+import { setPlaylist } from '../music'
+import { useGatePassed } from '../gate'
 import './LanguageSelect.css'
 
 const options: { lang: Lang; label: string }[] = [
@@ -14,11 +16,14 @@ export default function LanguageSelect() {
   const preferred = storedLang() ?? (navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en')
   const preferredRef = useRef<HTMLAnchorElement>(null)
   useGameKeys() // Es la primera pantalla: no hay a dónde volver
+  const gatePassed = useGatePassed()
 
   useEffect(() => {
+    setPlaylist('menu')
     document.documentElement.lang = preferred
-    preferredRef.current?.focus({ preventScroll: true })
-  }, [preferred])
+    // Tras la advertencia de entrada, el alma empieza en el idioma preferido
+    if (gatePassed) preferredRef.current?.focus({ preventScroll: true })
+  }, [preferred, gatePassed])
 
   return (
     <main className="lang-select">

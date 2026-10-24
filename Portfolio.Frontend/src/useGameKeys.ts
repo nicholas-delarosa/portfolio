@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { play } from './sound'
+import { isGatePassed } from './gate'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
 
@@ -88,7 +89,7 @@ export function useGameKeys(onBack?: () => void) {
         const event = new CustomEvent(BACK_EVENT, { cancelable: true })
         modal.dispatchEvent(event)
         if (event.defaultPrevented) {
-          play('click')
+          play('move')
           return true
         }
       }
@@ -96,20 +97,21 @@ export function useGameKeys(onBack?: () => void) {
       const backSelector = target.closest<HTMLElement>('[data-menu-back]')?.dataset.menuBack
       const parent = backSelector ? document.querySelector<HTMLElement>(backSelector) : null
       if (parent && isVisible(parent)) {
-        play('click')
+        play('move')
         focusItem(parent)
         return true
       }
       if (onBackRef.current) {
-        play('click')
+        play('move')
         onBackRef.current()
         return true
       }
       return false
     }
 
+    // Mientras está la advertencia de entrada, los controles del juego no hacen nada
     const ignore = (event: KeyboardEvent) =>
-      event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey ||
+      !isGatePassed() || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey ||
       !!(event.target as HTMLElement).closest('input, textarea, select, [contenteditable="true"]')
 
     const onKeyDown = (event: KeyboardEvent) => {

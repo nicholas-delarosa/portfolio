@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
-// Sonidos del menú (hover/click) y el "blip" de la caja de diálogo, con un interruptor global
+// Efectos de sonido de DELTARUNE (Toby Fox), con un interruptor global.
+// Se reproducen con Web Audio: suenan al instante, incluso varios seguidos (ej. el "tic" del alma)
 const STORAGE_KEY = 'portfolio.sound'
 const listeners = new Set<() => void>()
 
@@ -31,56 +32,78 @@ const subscribe = (listener: () => void) => {
 
 export const useSoundEnabled = () => useSyncExternalStore(subscribe, isSoundEnabled, () => true)
 
-type Effect = 'hover' | 'click'
-const volumes: Record<Effect, number> = { hover: 0.35, click: 0.6 }
-const samples: Partial<Record<Effect, HTMLAudioElement>> = {}
-let lastHover = 0
+export type Effect = 'move' | 'select' | 'error' | 'text' | 'item' | 'save' | 'hurt' | 'power' | 'shine'
+
+const effects: Record<Effect, { file: string; volume: number }> = {
+  move: { file: 'menumove', volume: 0.5 },      // mover el alma
+  select: { file: 'select', volume: 0.5 },      // confirmar
+  error: { file: 'cantselect', volume: 0.5 },   // no se puede (campo vacío, botón deshabilitado)
+  text: { file: 'text', volume: 0.35 },         // letra de la caja de diálogo
+  item: { file: 'item', volume: 0.5 },          // copiar el correo
+  save: { file: 'save', volume: 0.5 },          // mensaje enviado
+  hurt: { file: 'hurtsmall', volume: 0.5 },     // el mensaje no se pudo enviar
+  power: { file: 'power', volume: 0.5 },        // descargar el CV
+  shine: { file: 'shineselect', volume: 0.45 }  // abrir un demo o el código
+}
+
+let context: AudioContext | null = null
+const buffers = new Map<Effect, Promise<AudioBuffer | null>>()
+
+// Antes del primer clic o tecla el navegador no deja sonar nada: ni lo intentamos
+function audioContext() {
+  if (!navigator.userActivation?.hasBeenActive) return null
+  try {
+    context ??= new AudioContext()
+    if (context.state === 'suspended') context.resume().catch(() => {})
+    return context
+  } catch {
+    return null // Navegadores sin Web Audio: sin sonido
+  }
+}
+
+function load(effect: Effect, ctx: AudioContext) {
+  let buffer = buffers.get(effect)
+  if (!buffer) {
+    buffer = fetch(`/sounds/${effects[effect].file}.wav`)
+      .then((r) => r.arrayBuffer())
+      .then((data) => ctx.decodeAudioData(data))
+      .catch(() => null)
+    buffers.set(effect, buffer)
+  }
+  return buffer
+}
+
+const lastPlayed: Partial<Record<Effect, number>> = {}
 
 export function play(effect: Effect) {
   if (!enabled) return
   // Evita la ametralladora de sonidos al pasar el mouse rápido por una lista
-  if (effect === 'hover') {
-    const now = performance.now()
-    if (now - lastHover < 70) return
-    lastHover = now
-  }
-  samples[effect] ??= new Audio(`/sounds/${effect}.mp3`)
-  const audio = samples[effect]!.cloneNode() as HTMLAudioElement
-  audio.volume = volumes[effect]
-  // El navegador bloquea el audio hasta la primera interacción: se ignora en silencio
-  audio.play().catch(() => {})
+  const now = performance.now()
+  if (effect === 'move' && now - (lastPlayed.move ?? 0) < 45) return
+  lastPlayed[effect] = now
+
+  const ctx = audioContext()
+  if (!ctx) return
+  load(effect, ctx).then((buffer) => {
+    if (!buffer) return
+    const source = ctx.createBufferSource()
+    const gain = ctx.createGain()
+    source.buffer = buffer
+    gain.gain.value = effects[effect].volume
+    source.connect(gain).connect(ctx.destination)
+    source.start()
+  })
 }
 
-let context: AudioContext | null = null
+// "Blip" de la caja de diálogo
+export const blip = () => play('text')
 
-// Sonido de "texto escribiéndose", generado al vuelo (onda cuadrada corta, como en el juego)
-export function blip() {
-  // Antes del primer clic o tecla el navegador no deja sonar nada: ni lo intentamos
-  if (!enabled || !navigator.userActivation?.hasBeenActive) return
-  try {
-    context ??= new AudioContext()
-    if (context.state === 'suspended') {
-      context.resume().catch(() => {})
-      return
-    }
-    const oscillator = context.createOscillator()
-    const gain = context.createGain()
-    const now = context.currentTime
-    oscillator.type = 'square'
-    oscillator.frequency.value = 480 + Math.random() * 40
-    gain.gain.setValueAtTime(0.035, now)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045)
-    oscillator.connect(gain).connect(context.destination)
-    oscillator.start(now)
-    oscillator.stop(now + 0.05)
-  } catch {
-    // Navegadores sin Web Audio: sin sonido
+// Con la primera interacción se precargan los sonidos más usados, para que el primero no llegue tarde
+if (typeof window !== 'undefined') {
+  const warmUp = () => {
+    const ctx = audioContext()
+    if (ctx) (['move', 'select', 'text'] as Effect[]).forEach((e) => load(e, ctx))
   }
-}
-
-// Atajos para usar en los elementos de menú
-export const soundProps = {
-  onMouseEnter: () => play('hover'),
-  onFocus: () => play('hover'),
-  onClick: () => play('click')
+  window.addEventListener('pointerdown', warmUp, { once: true })
+  window.addEventListener('keydown', warmUp, { once: true })
 }

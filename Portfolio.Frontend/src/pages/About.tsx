@@ -160,11 +160,11 @@ export default function About() {
         <section className="box about-items" aria-labelledby="items-title">
           <h2 id="items-title" className="box-title">{t.items}</h2>
           <Menu direction="row" className="about-items-menu" label={t.items}>
-            <MenuAnchor href={profile.cvUrl} download>
+            <MenuAnchor href={profile.cvUrl} download sound="power">
               {t.cvItem}
             </MenuAnchor>
             {profile.cvOtherLanguageUrl && profile.cvOtherLanguageUrl !== profile.cvUrl && (
-              <MenuAnchor href={profile.cvOtherLanguageUrl} download>
+              <MenuAnchor href={profile.cvOtherLanguageUrl} download sound="power">
                 {t.cvOther}
               </MenuAnchor>
             )}

@@ -1,8 +1,12 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useGameKeys } from '../useGameKeys'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { isLang, LangContext, pathFor, rememberLang, sectionFromSlug, strings, type Lang, type Section } from '../i18n'
 import { setSoundEnabled, useSoundEnabled } from '../sound'
+import { setMusicEnabled, setPlaylist, useMusicEnabled, useNowPlaying } from '../music'
+import type { Playlist } from '../musicLibrary'
+import SecretRoom from './SecretRoom'
+import SplashOverlay, { type SplashVideo } from './SplashOverlay'
 import { Menu, MenuButton, MenuLink } from './Menu'
 import Home from '../pages/Home'
 import Projects from '../pages/Projects'
@@ -13,11 +17,22 @@ import './Layout.css'
 
 const pages: Record<Section, () => React.JSX.Element> = { home: Home, projects: Projects, about: About, contact: Contact }
 
+// Lista de música de cada sección: el inicio es el "menú"; el resto, canciones del juego
+const playlists: Record<Section, Playlist> = { home: 'menu', projects: 'game', about: 'game', contact: 'game' }
+
+// Video de entrada de cada sección (sale cada vez que se entra)
+const splashes: Partial<Record<Section, SplashVideo>> = { projects: 'queen', about: 'tenna', contact: 'legend' }
+
+// Probabilidad de caer en la habitación secreta al entrar a una página
+const ROOM_CHANCE = 1 / 50
+
 export default function Layout() {
   const { lang, section: slug } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
   const soundOn = useSoundEnabled()
+  const musicOn = useMusicEnabled()
+  const nowPlaying = useNowPlaying()
 
   const valid = isLang(lang)
   const currentLang: Lang = valid ? lang : 'es'
@@ -34,12 +49,37 @@ export default function Layout() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  useGameKeys(() => navigate(section === 'home' ? '/' : pathFor(currentLang, 'home')))
+  // Se tira el dado al cambiar de página (no al elegir un proyecto, que solo cambia ?p=).
+  // Al salir de la habitación se vuelve con fromRoom para no caer de nuevo enseguida
+  const fromRoom = (location.state as { fromRoom?: boolean } | null)?.fromRoom === true
+  const inRoom = useMemo(
+    () =>
+      !fromRoom &&
+      ((import.meta.env.DEV && new URLSearchParams(location.search).has('room')) || Math.random() < ROOM_CHANCE),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname, location.state]
+  )
+  const leaveRoom = () => navigate(pathFor(currentLang, 'home'), { state: { fromRoom: true } })
+
+  useEffect(() => {
+    if (section) setPlaylist(inRoom ? 'room' : playlists[section])
+  }, [section, inRoom])
+
+  useGameKeys(() => (inRoom ? leaveRoom() : navigate(section === 'home' ? '/' : pathFor(currentLang, 'home'))))
 
   if (!valid || !section) return <NotFound />
 
+  if (inRoom) {
+    return (
+      <LangContext.Provider value={currentLang}>
+        <SecretRoom onLeave={leaveRoom} />
+      </LangContext.Provider>
+    )
+  }
+
   const otherLang: Lang = currentLang === 'es' ? 'en' : 'es'
   const Page = pages[section]
+  const splash = splashes[section]
 
   return (
     <LangContext.Provider value={currentLang}>
@@ -55,10 +95,21 @@ export default function Layout() {
             <MenuButton onClick={() => setSoundEnabled(!soundOn)} aria-pressed={soundOn}>
               {t.sound}: {soundOn ? t.on : t.off}
             </MenuButton>
+            <MenuButton onClick={() => setMusicEnabled(!musicOn)} aria-pressed={musicOn}>
+              {t.music}: {musicOn ? t.on : t.off}
+            </MenuButton>
+            {nowPlaying && (
+              <span className="layout-now" aria-live="polite">
+                ♪ {nowPlaying}
+              </span>
+            )}
           </Menu>
         </header>
 
         <main className="layout-main">
+          {/* key: al cambiar de sección el video vuelve a empezar. Se monta antes que la página para
+              que pause la música antes de que arranque la de la sección */}
+          {splash && <SplashOverlay key={section} video={splash} />}
           <Page />
         </main>
 

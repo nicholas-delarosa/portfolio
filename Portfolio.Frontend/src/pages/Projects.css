@@ -221,11 +221,12 @@
   color: var(--gray);
 }
 
-button.projects-hint:not(:disabled):hover {
+button.projects-hint:not([aria-disabled='true']):hover {
   color: var(--white);
 }
 
-button.projects-hint:disabled {
+/* Sigue siendo clicable para que suene el "no se puede", como en el juego */
+button.projects-hint[aria-disabled='true'] {
   opacity: 0.45;
   cursor: default;
 }

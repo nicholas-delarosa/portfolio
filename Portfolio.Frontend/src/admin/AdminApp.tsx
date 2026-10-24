@@ -8,6 +8,7 @@ import SkillsAdmin from './SkillsAdmin'
 import TimelineAdmin from './TimelineAdmin'
 import MessagesAdmin from './MessagesAdmin'
 import SyncAdmin from './SyncAdmin'
+import { setPlaylist } from '../music'
 import './Admin.css'
 
 const sections = [
@@ -28,6 +29,7 @@ export default function AdminApp() {
   useEffect(() => {
     document.documentElement.lang = 'es'
     document.title = 'Admin · Portafolio'
+    setPlaylist(null) // en el admin no suena música
     // Que los buscadores no indexen el panel
     const robots = document.createElement('meta')
     robots.name = 'robots'

@@ -3,6 +3,7 @@ import { useLang, useT } from '../i18n'
 import { ApiError, sendContact, useSite } from '../api'
 import { Menu, MenuAnchor, MenuButton } from '../components/Menu'
 import { Loading, LoadError } from '../components/Status'
+import { play } from '../sound'
 import './Contact.css'
 
 type Status = 'idle' | 'sending' | 'sent' | 'tooMany' | 'error'
@@ -30,8 +31,13 @@ export default function Contact() {
 
   const copyEmail = async () => {
     if (!profile.email) return
-    if (await copyText(profile.email)) setNotice(t.emailCopied)
-    else window.location.href = `mailto:${profile.email}`
+    if (await copyText(profile.email)) {
+      play('item') // como recibir un ítem
+      setNotice(t.emailCopied)
+    } else {
+      play('select')
+      window.location.href = `mailto:${profile.email}`
+    }
   }
 
   const validate = (values: Fields) => {
@@ -48,6 +54,7 @@ export default function Contact() {
     const found = validate(fields)
     setErrors(found)
     if (Object.keys(found).length > 0) {
+      play('error')
       document.getElementById(`contact-${Object.keys(found)[0]}`)?.focus()
       return
     }
@@ -55,14 +62,17 @@ export default function Contact() {
     setStatus('sending')
     try {
       await sendContact({ ...fields, language: lang, website: honeypot.current?.value ?? '' })
+      play('save') // como guardar en un punto de guardado
       setStatus('sent')
       setFields(empty)
     } catch (e) {
       if (e instanceof ApiError && e.status === 400) {
         // El servidor revalida: mostrar sus mensajes en los campos
+        play('error')
         setErrors(Object.fromEntries(Object.entries(e.errors).map(([k, v]) => [k, v[0]])))
         setStatus('idle')
       } else {
+        play('hurt')
         setStatus(e instanceof ApiError && e.status === 429 ? 'tooMany' : 'error')
       }
     }
@@ -89,7 +99,7 @@ export default function Contact() {
           <h2 id="act-title" className="box-title contact-act-title">{t.actMenu}</h2>
           <Menu className="contact-act-menu" label={t.actMenu}>
             {profile.email && (
-              <MenuButton onClick={copyEmail} className="soul-inside">
+              <MenuButton onClick={copyEmail} className="soul-inside" sound={null}>
                 <span className="soul-slot">* {t.actEmail}</span>
                 <span className="contact-act-detail">
                   {/* Si no cabe, que corte después de la @ y no en medio de una palabra */}

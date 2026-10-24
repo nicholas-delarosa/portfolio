@@ -26,6 +26,13 @@
   font-size: var(--fs-md);
 }
 
+.layout-now {
+  align-self: center;
+  color: var(--gray);
+  font-family: var(--font-menu);
+  font-size: var(--fs-sm);
+}
+
 .layout-main {
   flex: 1;
 }

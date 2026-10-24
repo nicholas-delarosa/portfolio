@@ -2,48 +2,37 @@ import { useEffect, useRef, useState } from 'react'
 import { useT } from '../i18n'
 import { isSoundEnabled } from '../sound'
 import { BACK_EVENT } from '../useGameKeys'
+import { useGatePassed } from '../gate'
+import { pauseMusic, resumeMusic } from '../music'
 import './SplashOverlay.css'
 
-const videos = [
-  'https://res.cloudinary.com/dw2auacau/video/upload/v1758726511/Queen_Splash.mp4',
-  'https://res.cloudinary.com/dw2auacau/video/upload/v1758726492/Tenna_Splash.mp4',
-  'https://res.cloudinary.com/dw2auacau/video/upload/v1758726527/Legend_Splash.mp4'
-]
-
-const SEEN_KEY = 'portfolio.splashSeen'
-
-const alreadySeen = () => {
-  try {
-    return sessionStorage.getItem(SEEN_KEY) === '1'
-  } catch {
-    return false
-  }
+// Video de entrada de cada sección. Sale cada vez que se entra y se puede saltar
+const videos = {
+  queen: 'https://res.cloudinary.com/dw2auacau/video/upload/v1758726511/Queen_Splash.mp4',
+  tenna: 'https://res.cloudinary.com/dw2auacau/video/upload/v1758726492/Tenna_Splash.mp4',
+  legend: 'https://res.cloudinary.com/dw2auacau/video/upload/v1758726527/Legend_Splash.mp4'
 }
 
-// Video de entrada a Proyectos: uno al azar, una vez por visita, y se puede saltar
-export default function SplashOverlay() {
+export type SplashVideo = keyof typeof videos
+
+export default function SplashOverlay({ video }: { video: SplashVideo }) {
   const t = useT()
-  const [visible, setVisible] = useState(
-    () => !alreadySeen() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
-  const [src] = useState(() => videos[Math.floor(Math.random() * videos.length)])
+  const gatePassed = useGatePassed()
+  const [visible, setVisible] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const rootRef = useRef<HTMLDivElement>(null)
   const skipRef = useRef<HTMLButtonElement>(null)
   const fallbackRef = useRef<number | undefined>(undefined)
 
-  const close = () => {
-    setVisible(false)
-    try {
-      sessionStorage.setItem(SEEN_KEY, '1')
-    } catch {
-      // Sin almacenamiento: puede volver a salir, no es grave
-    }
-  }
+  const close = () => setVisible(false)
+  // Se espera a la advertencia de entrada: antes de ese clic el navegador no dejaría sonar el video
+  const showing = visible && gatePassed
 
   useEffect(() => {
-    if (!visible) return
+    if (!showing) return
     const root = rootRef.current
     skipRef.current?.focus({ preventScroll: true })
+    // La música se calla mientras suena el video y vuelve al terminar
+    pauseMusic()
 
     // X/Esc/Shift (vía useGameKeys) saltan el video en vez de salir de la página
     const onBack = (event: Event) => {
@@ -66,16 +55,17 @@ export default function SplashOverlay() {
       root?.removeEventListener(BACK_EVENT, onBack)
       window.removeEventListener('keydown', onKey, true)
       window.clearTimeout(fallbackRef.current)
+      resumeMusic()
     }
-  }, [visible])
+  }, [showing])
 
-  if (!visible) return null
+  if (!showing) return null
 
   return (
     <div ref={rootRef} className="splash" role="dialog" aria-modal="true" aria-label={t.loading} onClick={close}>
       <video
         className="splash-video"
-        src={src}
+        src={videos[video]}
         autoPlay
         playsInline
         muted={!isSoundEnabled()}
