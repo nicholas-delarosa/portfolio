@@ -5,7 +5,7 @@ import { isLang, LangContext, pathFor, rememberLang, sectionFromSlug, strings, t
 import { setSoundEnabled, useSoundEnabled } from '../sound'
 import { setMusicEnabled, setPlaylist, useMusicEnabled, useNowPlaying } from '../music'
 import type { Playlist } from '../musicLibrary'
-import SecretRoom from './SecretRoom'
+import SecretRoom, { visitRoom } from './SecretRoom'
 import SplashOverlay, { type SplashVideo } from './SplashOverlay'
 import { Menu, MenuButton, MenuLink } from './Menu'
 import Home from '../pages/Home'
@@ -52,27 +52,35 @@ export default function Layout() {
   // Se tira el dado al cambiar de página (no al elegir un proyecto, que solo cambia ?p=).
   // Al salir de la habitación se vuelve con fromRoom para no caer de nuevo enseguida
   const fromRoom = (location.state as { fromRoom?: boolean } | null)?.fromRoom === true
-  const inRoom = useMemo(
-    () =>
-      !fromRoom &&
-      ((import.meta.env.DEV && new URLSearchParams(location.search).has('room')) || Math.random() < ROOM_CHANCE),
+  // null = página normal; si no, qué canción suena en la habitación y qué escena se ve
+  const room = useMemo(
+    () => {
+      if (fromRoom) return null
+      // Solo en desarrollo: ?room fuerza la habitación (?room=man_nes una canción, &scene=tree|black la escena)
+      const params = new URLSearchParams(location.search)
+      if (import.meta.env.DEV && params.has('room')) return visitRoom(params.get('room'), params.get('scene'))
+      return Math.random() < ROOM_CHANCE ? visitRoom() : null
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.pathname, location.state]
   )
+  const inRoom = room !== null
   const leaveRoom = () => navigate(pathFor(currentLang, 'home'), { state: { fromRoom: true } })
 
   useEffect(() => {
-    if (section) setPlaylist(inRoom ? 'room' : playlists[section])
-  }, [section, inRoom])
+    if (!section) return
+    if (room) setPlaylist('room', room.track.file)
+    else setPlaylist(playlists[section])
+  }, [section, room])
 
   useGameKeys(() => (inRoom ? leaveRoom() : navigate(section === 'home' ? '/' : pathFor(currentLang, 'home'))))
 
   if (!valid || !section) return <NotFound />
 
-  if (inRoom) {
+  if (room) {
     return (
       <LangContext.Provider value={currentLang}>
-        <SecretRoom onLeave={leaveRoom} />
+        <SecretRoom scene={room.scene} onLeave={leaveRoom} />
       </LangContext.Provider>
     )
   }

@@ -19,6 +19,7 @@ let enabled = (() => {
 })()
 
 let wanted: Playlist | null = null
+let wantedFile: string | null = null // canción concreta pedida (la habitación secreta elige la suya)
 let pauses = 0 // cuántos videos de entrada piden silencio ahora mismo
 let current: { playlist: Playlist; track: MusicTrack; player: Player } | null = null
 const recent: string[] = []
@@ -52,9 +53,13 @@ export function setMusicEnabled(value: boolean) {
   sync()
 }
 
-// La página dice qué lista le corresponde (null = silencio, ej. el admin)
-export function setPlaylist(playlist: Playlist | null) {
+// La página dice qué lista le corresponde (null = silencio, ej. el admin) y, si quiere, con qué canción empezar
+export function setPlaylist(playlist: Playlist | null, file: string | null = null) {
+  const changed = playlist !== wanted || file !== wantedFile
   wanted = playlist
+  wantedFile = file
+  // Misma lista pero otra canción pedida (ej. se entra de nuevo a la habitación): empezar de cero
+  if (changed && file && current?.playlist === playlist && current.track.file !== file) stopCurrent()
   sync()
 }
 
@@ -95,9 +100,13 @@ function sync() {
     else current.player.resume()
   } else {
     stopCurrent()
-    if (!isPaused()) play(target, forcedTrack(target) ?? pickNext(target))
+    if (!isPaused()) play(target, forcedTrack(target) ?? requestedTrack(target) ?? pickNext(target))
   }
   notify()
+}
+
+function requestedTrack(playlist: Playlist) {
+  return wantedFile ? library[playlist].find((t) => t.file === wantedFile) : undefined
 }
 
 // Solo en desarrollo: ?song=archivo fuerza la primera canción (para escuchar una en particular)
