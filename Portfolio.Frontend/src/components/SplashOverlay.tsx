@@ -6,7 +6,8 @@ import { useGatePassed } from '../gate'
 import { pauseMusic, resumeMusic } from '../music'
 import './SplashOverlay.css'
 
-// Video de entrada de cada sección. Sale cada vez que se entra y se puede saltar
+// Video de entrada de cada sección: sale la primera vez que se entra a ella después de abrir o recargar
+// el sitio (no al volver navegando dentro de él). Se puede saltar
 const videos = {
   queen: 'https://res.cloudinary.com/dw2auacau/video/upload/v1758726511/Queen_Splash.mp4',
   tenna: 'https://res.cloudinary.com/dw2auacau/video/upload/v1758726492/Tenna_Splash.mp4',
@@ -15,10 +16,15 @@ const videos = {
 
 export type SplashVideo = keyof typeof videos
 
+// Vive en memoria: al recargar la página se vacía y los videos vuelven a salir
+const alreadyShown = new Set<SplashVideo>()
+
 export default function SplashOverlay({ video }: { video: SplashVideo }) {
   const t = useT()
   const gatePassed = useGatePassed()
-  const [visible, setVisible] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [visible, setVisible] = useState(
+    () => !alreadyShown.has(video) && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
   const rootRef = useRef<HTMLDivElement>(null)
   const skipRef = useRef<HTMLButtonElement>(null)
   const fallbackRef = useRef<number | undefined>(undefined)
@@ -29,6 +35,7 @@ export default function SplashOverlay({ video }: { video: SplashVideo }) {
 
   useEffect(() => {
     if (!showing) return
+    alreadyShown.add(video)
     const root = rootRef.current
     skipRef.current?.focus({ preventScroll: true })
     // La música se calla mientras suena el video y vuelve al terminar
@@ -57,7 +64,7 @@ export default function SplashOverlay({ video }: { video: SplashVideo }) {
       window.clearTimeout(fallbackRef.current)
       resumeMusic()
     }
-  }, [showing])
+  }, [showing, video])
 
   if (!showing) return null
 
