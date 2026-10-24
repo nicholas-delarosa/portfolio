@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import LanguageSelect from './pages/LanguageSelect'
 import Layout from './components/Layout'
 import WarningGate from './components/WarningGate'
+import SongPopup from './components/SongPopup'
 import './styles/global.css'
 
 // El admin se descarga aparte: los visitantes nunca lo cargan
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <WarningGate />
+      <SongPopup />
       <Routes>
         <Route path="/" element={<LanguageSelect />} />
         <Route

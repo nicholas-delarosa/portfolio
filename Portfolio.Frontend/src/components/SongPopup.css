@@ -1,0 +1,48 @@
+/* "The Field of Hopes and Dreams" de Chujin. Copia con el nombre interno en ASCII: el original
+   lleva una nota musical en el nombre y los navegadores rechazan la fuente */
+@font-face {
+  font-family: 'Hopes and Dreams';
+  src: url('/fonts/hopes-and-dreams.woff2') format('woff2');
+  font-display: block;
+}
+
+.song-popup {
+  position: fixed;
+  top: 76px; /* debajo de la cabecera */
+  left: 14px;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  padding: 4px 18px 6px 10px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.85) 70%, rgba(0, 0, 0, 0));
+  color: #e9edff;
+  font-family: 'Hopes and Dreams', var(--font-menu);
+  font-size: 30px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Borde oscuro de 1 px alrededor de las letras, como en el juego */
+  text-shadow: 2px 0 #1c1840, -2px 0 #1c1840, 0 2px #1c1840, 0 -2px #1c1840;
+  animation:
+    song-popup-in 360ms steps(6) both,
+    song-popup-out 600ms steps(6) 3900ms both;
+}
+
+@keyframes song-popup-in {
+  from {
+    transform: translateX(-110%);
+  }
+}
+
+@keyframes song-popup-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .song-popup {
+    top: 110px;
+    font-size: 22px;
+  }
+}
