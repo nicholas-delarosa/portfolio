@@ -1,5 +1,6 @@
-# Secretos
+# Secretos y respaldos de la base de datos
 .env
+backups/
 **/appsettings.*.local.json
 
 # .NET

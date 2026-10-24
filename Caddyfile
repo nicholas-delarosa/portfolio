@@ -6,6 +6,10 @@
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Solo se cargan scripts propios. Imágenes: Cloudinary, GitHub y logos de asociaciones (https).
+		# Videos de entrada desde Cloudinary. Los estilos inline son los colores de etiquetas que se eligen en el admin
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https://res.cloudinary.com; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
 		-Server
 	}
 

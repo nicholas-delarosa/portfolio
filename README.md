@@ -80,10 +80,14 @@ dotnet ef migrations add NombreDelCambio --project src/Portfolio.Api -o Data/Mig
 
 ## Producción
 
+Guía completa paso a paso (Oracle Cloud gratis + dominio): **[DEPLOY.md](DEPLOY.md)**.
+
 ```bash
 cp .env.example .env   # y llena los valores
-docker compose up -d --build
+bash deploy/deploy.sh  # git pull + docker compose up -d --build
 ```
+
+Scripts en `deploy/`: preparar el servidor, desplegar, respaldo diario de la base de datos y restaurar.
 
 ## Sincronización con GitHub
 
